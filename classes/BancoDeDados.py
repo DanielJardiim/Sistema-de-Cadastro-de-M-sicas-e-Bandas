@@ -40,3 +40,15 @@ class BandasCRUD(object):
     def delete(self, banda):
         return self.db.execute_query('MATCH (n:Banda {nome:$nome}) DELETE n',
                                      {'nome': banda['nome']})
+
+class Relacionamentos(object):
+    def __init__(self):
+        self.db = Graph(uri='bolt://54.172.25.212:7687',
+                        user='neo4j', password='tail-wreck-fountain')
+
+    def create_relation(self, musica, banda, relacao):
+        return self.db.execute_query('MATCH (m:Musica {nome:$nome1}), (b:Banda {nome:$nome2}) CREATE (m)-[r:MUSICA_DA_BANDA{desde: $desde}]->(b) RETURN m, r, b',
+                                     {'nome1': musica['nome'], 'nome2': banda['nome'], 'desde': relacao['desde']})
+
+    def delete_all_nodes(self):
+        return self.db.execute_query('MATCH (n) DETACH DELETE n')
